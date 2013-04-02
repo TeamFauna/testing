@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Collections;
 import java.io.IOException;
+import java.util.Hashtable;
 
 class Pipair {
 
@@ -16,18 +17,16 @@ class Pipair {
         }
     }
 
-    class CallGraph {
-        public void parseFile(String fileName) {
-            Runtime rt = Runtime.getRuntime();
-            try {
-                Process pr = rt.exec("opt -print-callgraph " + fileName);
-            } catch (IOException e) {
-            }
+    public HashTable<String,ArrayList<String>> parseFile(String fileName) {
+        Runtime rt = Runtime.getRuntime();
+        try {
+            Process pr = rt.exec("opt -print-callgraph " + fileName);
+        } catch (IOException e) {
         }
+    }
 
-        public ArrayList<Pair> getPairs() {
-            return new ArrayList<Pair>(); // TODO
-        }
+    public ArrayList<Pair> getPairs() {
+        return new ArrayList<Pair>(); // TODO
     }
 
     int tSupport = 3;
