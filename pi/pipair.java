@@ -17,13 +17,14 @@ class Pipair {
         }
     }
 
-    public HashTable<String,ArrayList<String>> parseFile(String fileName) {
+    public Hashtable<String,ArrayList<String>> parseFile(String fileName) {
         Runtime rt = Runtime.getRuntime();
         try {
             Process pr = rt.exec("opt -print-callgraph " + fileName);
             System.out.println("test");
         } catch (IOException e) {
         }
+        return null;
     }
 
     public ArrayList<Pair> getPairs() {
@@ -34,10 +35,8 @@ class Pipair {
     float tConfidence = 0.65f;
 
     public void run(String cgFile) {
-        CallGraph cg = new CallGraph();
-        cg.parseFile(cgFile);
-        ArrayList<Pair> results = cg.getPairs();
-        printResults(results);
+        Hashtable<String, ArrayList<String>> table = parseFile(cgFile);
+       // printResults(results);
         System.out.println(tSupport);
         System.out.println(tConfidence);
     }
