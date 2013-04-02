@@ -16,8 +16,11 @@ class Pipair {
     }
 
     class CallGraph {
+        public void parseFile(String fileName) {
+        }
+
         public ArrayList<Pair> getPairs() {
-            return new ArrayList<Pair>();
+            return new ArrayList<Pair>(); // TODO
         }
     }
 
@@ -26,6 +29,7 @@ class Pipair {
 
     public void run(String cgFile) {
         CallGraph cg = new CallGraph();
+        cg.parseFile(cgFile);
         ArrayList<Pair> results = cg.getPairs();
         printResults(results);
         System.out.println(tSupport);
