@@ -118,7 +118,7 @@ class Pipair {
         numf.setMinimumFractionDigits(2);
         numf.setRoundingMode(RoundingMode.HALF_EVEN);
 
-        Hashtable<String,ArrayList<String>> cg = parseFile(cgFile);
+        Hashtable<String,ArrayList<String>> cg = Parser.parseFile(cgFile);
         SupportGraph sg = new SupportGraph();
         sg.parseFromCallGraph(cg);
         findAndPrintViolations(cg, sg);
