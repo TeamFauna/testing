@@ -134,18 +134,16 @@ class Pipair {
             ArrayList<String> calls = (ArrayList<String>)funcs.nextElement();
             calls = removeDuplicateCalls(calls);
 
-            if (calls.size() > 1) { 
-              for (int i = 0; i < calls.size(); i++) {
-                  for (int j = i + 1; j < calls.size(); j++) {
-                      createOrStrengthenPair(pairs, calls.get(i), calls.get(j));
-                      createOrStrengthenPair(pairs, calls.get(j), calls.get(i));
-                  }
+            for (int i = 0; i < calls.size(); i++) {
+                for (int j = i + 1; j < calls.size(); j++) {
+                    createOrStrengthenPair(pairs, calls.get(i), calls.get(j));
+                    createOrStrengthenPair(pairs, calls.get(j), calls.get(i));
+                }
 
-                  Hashtable<String,Pair> existingPairs = pairs.get(calls.get(i));
-                  for (int k = 0; k < existingPairs.size(); k++) {
-                      existingPairs.get(k).weaken();
-                  }
-              }
+                Hashtable<String,Pair> existingPairs = pairs.get(calls.get(i));
+                for (int k = 0; k < existingPairs.size(); k++) {
+                    existingPairs.get(k).weaken();
+                }
             }
         }
 
