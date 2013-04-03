@@ -25,7 +25,7 @@ class Pipair {
         try {
             Process pr = rt.exec("opt -print-callgraph " + fileName);
             System.out.println("test2");
-            InputStream st = pr.getInputStream();
+            InputStream st = pr.getErrorStream();
             BufferedReader in = new BufferedReader(new InputStreamReader(st));
             String line = null;
 
