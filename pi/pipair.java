@@ -25,7 +25,6 @@ class Pipair {
         Hashtable<String, ArrayList<String>> table = new Hashtable<String,ArrayList<String>>();
         try {
             Process pr = rt.exec("opt -print-callgraph " + fileName);
-            System.out.println("test2");
             InputStream st = pr.getErrorStream();
             BufferedReader in = new BufferedReader(new InputStreamReader(st));
             String line = null;
@@ -44,7 +43,7 @@ class Pipair {
                     String func = slist[1];
                     ArrayList<String> curList = table.get(current);
                     curList.add(func);
-                    System.out.println(func);
+                    //System.out.println(func);
                     break;
                   }
                 case(0):
@@ -55,13 +54,13 @@ class Pipair {
                     ArrayList<String> nlist = new ArrayList<String>();
                     table.put(current,nlist);
                     state = 1;
-                    System.out.println(current);
+                    //System.out.println(current);
                     break;
                   }
                 default:
                   if (line.length() == 0) { 
                     state = 0;
-                    System.out.println("");
+                    //System.out.println("");
                   }
                   break;
               }
