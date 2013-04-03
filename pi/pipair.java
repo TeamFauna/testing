@@ -92,8 +92,8 @@ class Pipair {
             String f2 = i.next();
             String key = Pipair.getPairName(f1, f2);
             
-            if (!sg.supports.contains(key) ||
-                !sg.supports.contains(f1)) {
+            if (!sg.supports.containsKey(key) ||
+                !sg.supports.containsKey(f1)) {
                 continue;
             }
 
@@ -101,7 +101,7 @@ class Pipair {
             int singleSupport = sg.supports.get(f1).intValue();
             float confidence = (float)pairSupport/singleSupport;
 
-            if (confidence > tConfidence && pairSupport > tSupport) {
+            if (confidence >= tConfidence && pairSupport >= tSupport) {
                 if (!calls.contains(f2)) {
                     printViolation(caller, f1, f2, pairSupport,
                                    confidence);
