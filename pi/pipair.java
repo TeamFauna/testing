@@ -20,180 +20,97 @@ class Pipair {
     float tConfidence = 0.65f;
     NumberFormat numf = NumberFormat.getNumberInstance();
 
-    class Pair {
-        private String _aName;
-        private String _bName;
-        private int _support = 0;
-        private float _aWithoutB = 0;
-
-        public Pair(String aName, String bName) {
-            _aName = aName;
-            _bName = bName;
+    public static String getPairName(String a, String b) {
+        if (a.compareTo(b) > 0) {
+            String temp = a;
+            a = b;
+            b = temp;
         }
-
-        public String getSource() {
-            return _aName;
-        }
-
-        public String getTarget() {
-            return _bName;
-        }
-
-        public void strengthen() {
-            _support++;
-        }
-
-        public void weaken() {
-            _aWithoutB++;
-        }
-
-        public int getSupport() {
-            return _support;
-        }
-
-        public float getConfidence() {
-            return (float)_support / _aWithoutB;
-        }
-
-        public String toString() {
-            String a = getSource();
-            String b = getTarget();
-            if (a.compareTo(b) > 0) {
-                String temp = a;
-                a = b;
-                b = temp;
-            }
-
-            return "pair: (" +
-                a + " " + b + "), support: " +
-                getSupport() + ", confidence: " +
-                numf.format(getConfidence() * 100.0) + "%";
-        }
+        return a + ":" + b;
     }
 
-    class Violation {
-        private String _caller;
-        private Pair _pair;
+    class SupportGraph {
+        Hashtable<String,Integer> supports = new Hashtable<String,Integer>();
+        HashSet<String> allNames = new HashSet<String>();
 
-        public Violation(String caller, Pair pair) {
-            _caller = caller;
-            _pair = pair;
-        }
+        private void parseFromCallGraph(Hashtable<String,ArrayList<String>> cg) {
+            Enumeration funcs = cg.elements();
+            while (funcs.hasMoreElements()) {
+                ArrayList<String> calls = (ArrayList<String>)funcs.nextElement();
+                calls = removeDuplicateCalls(calls);
 
-        public String toString() {
-            return "bug: " + _pair.getSource() + " in " + _caller + ", " +
-                _pair.toString();
-        }
-    }
-
-    public Hashtable<String,Hashtable<String,Pair>>
-        getInvariantPairs(Hashtable<String,ArrayList<String>> cg) {
-
-        Hashtable<String,Hashtable<String,Pair>> pairs = getAllInvariantPairs(cg);
-        rejectWeakPairs(pairs);
-        return pairs;
-    }
-
-    private Hashtable<String,Hashtable<String,Pair>> getAllInvariantPairs(Hashtable<String,ArrayList<String>> cg) {
-        Hashtable<String,Hashtable<String,Pair>> pairs =
-            new Hashtable<String,Hashtable<String,Pair>>();
-
-        Enumeration funcs = cg.elements();
-        while (funcs.hasMoreElements()) {
-            ArrayList<String> calls = (ArrayList<String>)funcs.nextElement();
-            calls = removeDuplicateCalls(calls);
-
-            for (int i = 0; i < calls.size(); i++) {
-                for (int j = i + 1; j < calls.size(); j++) {
-                    createOrStrengthenPair(pairs, calls.get(i), calls.get(j));
-                    createOrStrengthenPair(pairs, calls.get(j), calls.get(i));
-                }
-
-                Hashtable<String,Pair> existingPairs = pairs.get(calls.get(i));
-                if (existingPairs != null) {
-                    Enumeration e = existingPairs.elements();
-                    while (e.hasMoreElements()) {
-                        Pair p = (Pair)e.nextElement();
-                        p.weaken();
+                for (int i = 0; i < calls.size(); i++) {
+                    allNames.add(calls.get(i));
+                    for (int j = i + 1; j < calls.size(); j++) {
+                        String name = Pipair.getPairName(calls.get(i),
+                                                         calls.get(j));
+                        createOrIncrementSupport(name);
                     }
+                    createOrIncrementSupport(calls.get(i));
                 }
             }
         }
 
-        return pairs;
-    }
+        private ArrayList<String> removeDuplicateCalls(ArrayList<String> calls) {
+            HashSet<String> callSet = new HashSet<String>(calls);
+            calls = new ArrayList<String>(callSet);
+            return calls;
+        }
 
-    private void
-        rejectWeakPairs(Hashtable<String,Hashtable<String,Pair>> pairs) {
-
-        Enumeration<Hashtable<String,Pair>> pairLists = pairs.elements();
-        while (pairLists.hasMoreElements()) {
-            Hashtable<String,Pair> pairList = (Hashtable<String,Pair>)pairLists.nextElement();
-
-            Enumeration<String> bNames = pairList.keys();
-            while (bNames.hasMoreElements()) {
-                String bName = bNames.nextElement();
-                Pair p = (Pair)pairList.get(bName);
-                if (p.getSupport() < tSupport ||
-                    p.getConfidence() < tConfidence) {
-                    pairList.remove(bName);
-                }
+        private void createOrIncrementSupport(String name) {
+            Integer curSing = supports.get(name);
+            if (curSing == null) {
+                supports.put(name, 1);
+            } else {
+                supports.put(name, new Integer(curSing + 1));
             }
         }
     }
 
-    private void createOrStrengthenPair(Hashtable<String,Hashtable<String,Pair>>
-                                       pairs,
-                                       String f1, String f2) {
-        Hashtable<String,Pair> funcPairs = pairs.get(f1);
-        if (funcPairs == null) {
-            funcPairs = new Hashtable<String,Pair>();
-            pairs.put(f1, funcPairs);
-        }
-        Pair p = funcPairs.get(f2);
-        if (p == null) {
-            p = new Pair(f1, f2);
-            funcPairs.put(f2, p);
-        }
-        p.strengthen();
-    }
-
-    private ArrayList<String> removeDuplicateCalls(ArrayList<String> calls) {
-        HashSet<String> callSet = new HashSet<String>(calls);
-        calls = new ArrayList<String>(callSet);
-        return calls;
-    }
-
-    public ArrayList<Violation>
-        getViolations(Hashtable<String,ArrayList<String>> cg,
-                      Hashtable<String,Hashtable<String,Pair>> invariants) {
-
-        ArrayList<Violation> violations = new ArrayList<Violation>();
-
+    public void findAndPrintViolations(Hashtable<String,ArrayList<String>> cg,
+                                       SupportGraph sg) {
         Enumeration<String> cgKeySet = cg.keys();
         while (cgKeySet.hasMoreElements()) {
-            String functionName = (String)cgKeySet.nextElement();
-            ArrayList<String> callsL = (ArrayList<String>)cg.get(functionName);
+            String caller = (String)cgKeySet.nextElement();
+            ArrayList<String> callsL = (ArrayList<String>)cg.get(caller);
             HashSet<String> calls = new HashSet<String>(callsL);
 
             Iterator i = calls.iterator();
             while (i.hasNext()) {
-                Hashtable<String,Pair> invariantsForCall = invariants.get(i.next());
-                if (invariantsForCall == null) {
-                    continue;
-                }
-                Enumeration pairs = invariantsForCall.elements();
-                while (pairs.hasMoreElements()) {
-                    Pair invariant = (Pair)pairs.nextElement();
-                    if (!calls.contains(invariant.getTarget())) {
-                        violations.add(new Violation(functionName,
-                                                      invariant));
-                    }
+                String f = (String)i.next();
+                printInvariantsForFunction(caller, f, sg, calls);
+            }
+        }
+    }
+
+    private void printInvariantsForFunction(String caller,
+                                            String f1,
+                                            SupportGraph sg,
+                                            HashSet<String> calls) {
+        Iterator<String> i = sg.allNames.iterator();
+        while (i.hasNext()) {
+            String f2 = i.next();
+            String key = Pipair.getPairName(f1, f2);
+            int pairSupport = sg.supports.get(key).intValue();
+            int singleSupport = sg.supports.get(f1).intValue();
+            float confidence = (float)pairSupport/singleSupport;
+
+            if (confidence > tConfidence && pairSupport > tSupport) {
+                if (!calls.contains(f2)) {
+                    printViolation(caller, f1, f2, pairSupport,
+                                   confidence);
                 }
             }
         }
-
-        return violations;
+    }
+    
+    public void printViolation(String caller, String f1, String f2,
+                               int support, float confidence) {
+        System.out.println("bug: " + f1 + " in " + caller + ", " +
+                           "pair: (" +
+                           f1 + " " + f2 + "), support: " +
+                           support + ", confidence: " +
+                           numf.format(confidence * 100.0) + "%");
     }
 
     public void run(String cgFile) {
@@ -201,19 +118,10 @@ class Pipair {
         numf.setMinimumFractionDigits(2);
         numf.setRoundingMode(RoundingMode.HALF_EVEN);
 
-        Hashtable<String,ArrayList<String>> cg = Parser.parseFile(cgFile);
-        Hashtable<String,Hashtable<String,Pair>> invariants =
-            getInvariantPairs(cg);
-        ArrayList<Violation> violations = getViolations(cg, invariants);
-        printViolations(violations);
-    }
-
-    public void printViolations(ArrayList<Violation> violations) {
-        Enumeration e = Collections.enumeration(violations);
-        while (e.hasMoreElements()) {
-            Violation v = (Violation)e.nextElement();
-            System.out.println(v);
-        }
+        Hashtable<String,ArrayList<String>> cg = parseFile(cgFile);
+        SupportGraph sg = new SupportGraph();
+        sg.parseFromCallGraph(cg);
+        findAndPrintViolations(cg, sg);
     }
 
     public static void main(String[] args) {
