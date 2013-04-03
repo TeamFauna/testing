@@ -38,17 +38,6 @@ class Pipair {
               System.out.println(line + " " + line.length());
 
               switch (state) {
-                case(0):
-                  if (line.startsWith("Call graph node for function")) {
-                    
-                    String[] slist = line.split("\'");
-                    current = slist[1];
-                    ArrayList<String> nlist = new ArrayList<String>();
-                    table.put(current,nlist);
-                    state = 1;
-                    System.out.println(current);
-                    break;
-                  }
                 case(1):
                   System.out.println("STATE 1");
                   if (line.matches("(.*)CS<0x[0-9a-f]*> calls function(.*)")) {
@@ -58,6 +47,17 @@ class Pipair {
                     ArrayList<String> curList = table.get(current);
                     curList.add(func);
                     System.out.println(func);
+                    break;
+                  }
+                case(0):
+                  if (line.startsWith("Call graph node for function")) {
+                    
+                    String[] slist = line.split("\'");
+                    current = slist[1];
+                    ArrayList<String> nlist = new ArrayList<String>();
+                    table.put(current,nlist);
+                    state = 1;
+                    System.out.println(current);
                     break;
                   }
                 default:
