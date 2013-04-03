@@ -80,6 +80,10 @@ class Parser {
 
                   ArrayList<String> funcsToBeAdded = staticTable.get(expandFunc);
 
+                  if (funcsToBeAdded.size() > 0) {
+                    calls.remove(expandFunc);
+                  }
+
                   for (int j = 0; j < funcsToBeAdded.size(); j++) {
                     String funcToBeAdded = (String)funcsToBeAdded.get(j);
                     if (!calls.contains(funcToBeAdded)) {
@@ -91,6 +95,7 @@ class Parser {
             }
         } catch (IOException e) {
         }
+        System.out.println(table);
         return table;
     }
 
