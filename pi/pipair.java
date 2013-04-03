@@ -21,7 +21,7 @@ class Pipair {
         Runtime rt = Runtime.getRuntime();
         try {
             Process pr = rt.exec("opt -print-callgraph " + fileName);
-            System.out.println("test");
+            System.out.println("test2");
         } catch (IOException e) {
         }
         return null;
