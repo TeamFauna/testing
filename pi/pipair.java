@@ -141,8 +141,12 @@ class Pipair {
                 }
 
                 Hashtable<String,Pair> existingPairs = pairs.get(calls.get(i));
-                for (int k = 0; k < existingPairs.size(); k++) {
-                    existingPairs.get(k).weaken();
+                if (existingPairs != null) {
+                    Enumeration e = existingPairs.elements();
+                    while (e.hasMoreElements()) {
+                        Pair p = (Pair)e.nextElement();
+                        p.weaken();
+                    }
                 }
             }
         }
