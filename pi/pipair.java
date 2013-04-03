@@ -91,6 +91,12 @@ class Pipair {
         while (i.hasNext()) {
             String f2 = i.next();
             String key = Pipair.getPairName(f1, f2);
+            
+            if (!sg.supports.contains(key) ||
+                !sg.supports.contains(f1)) {
+                continue;
+            }
+
             int pairSupport = sg.supports.get(key).intValue();
             int singleSupport = sg.supports.get(f1).intValue();
             float confidence = (float)pairSupport/singleSupport;
