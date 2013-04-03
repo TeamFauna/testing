@@ -19,6 +19,7 @@ class Pipair {
     int tSupport = 3;
     float tConfidence = 0.65f;
     NumberFormat numf = NumberFormat.getNumberInstance();
+    ArrayList<String> prints = new ArrayList<String>();
 
     public static String getPairName(String a, String b) {
         if (a.compareTo(b) > 0) {
@@ -112,11 +113,23 @@ class Pipair {
     
     public void printViolation(String caller, String f1, String f2,
                                int support, float confidence) {
-        System.out.println("bug: " + f1 + " in " + caller + ", " +
-                           "pair: (" +
-                           f1 + " " + f2 + "), support: " +
-                           support + ", confidence: " +
-                           numf.format(confidence * 100.0) + "%");
+        String pair;
+        if (f1.compareTo(f2) > 0) {
+            pair = f2 + " " + f1;
+        } else {
+            pair = f1 + " " + f2;
+        }
+        prints.add("bug: " + f1 + " in " + caller + ", " +
+                   "pair: (" + pair + "), support: " +
+                   support + ", confidence: " +
+                   numf.format(confidence * 100.0) + "%");
+    }
+
+    public void flushPrint() {
+        Collections.sort(prints);
+        for (int i = 0; i < prints.size(); i++) {
+            System.out.println(prints.get(i));
+        }
     }
 
     public void run(String cgFile) {
@@ -128,6 +141,7 @@ class Pipair {
         SupportGraph sg = new SupportGraph();
         sg.parseFromCallGraph(cg);
         findAndPrintViolations(cg, sg);
+        flushPrint();
     }
 
     public static void main(String[] args) {
