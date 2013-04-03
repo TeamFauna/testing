@@ -10,6 +10,8 @@ import java.util.Map;
 import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.text.NumberFormat;
+import java.math.RoundingMode;
 
 class Pipair {
 
@@ -25,6 +27,10 @@ class Pipair {
         public Pair(String aName, String bName) {
             _aName = aName;
             _bName = bName;
+        }
+
+        public String getSource() {
+            return _aName;
         }
 
         public String getTarget() {
@@ -48,7 +54,14 @@ class Pipair {
         }
 
         public String toString() {
-            return "TODO";
+            NumberFormat numf = NumberFormat.getNumberInstance();
+            numf.setMaximumFractionDigits(2);
+            numf.setRoundingMode(RoundingMode.HALF_EVEN);
+
+            return "pair: (" +
+                getSource() + " " + getTarget() + "), support: " +
+                getSupport() + ", confidence: " +
+                numf.format(getConfidence() * 100.0) + "%";
         }
     }
 
@@ -62,7 +75,8 @@ class Pipair {
         }
 
         public String toString() {
-            return "TODO";
+            return "bug: " + _pair.getSource() + " in " + _caller + ", " +
+                _pair.toString();
         }
     }
 
@@ -158,15 +172,17 @@ class Pipair {
     private void
         rejectWeakPairs(Hashtable<String,Hashtable<String,Pair>> pairs) {
 
-        Enumeration pairLists = pairs.elements();
+        Enumeration<Hashtable<String,Pair>> pairLists = pairs.elements();
         while (pairLists.hasMoreElements()) {
             Hashtable<String,Pair> pairList = (Hashtable<String,Pair>)pairLists.nextElement();
-            Enumeration callPairs = pairList.elements();
-            while (callPairs.hasMoreElements()) {
-                Pair p = (Pair)callPairs.nextElement();
-                if (p.getSupport() > tSupport &&
-                    p.getConfidence() > tConfidence) {
-                    pairList.remove(p);
+
+            Enumeration<String> bNames = pairList.keys();
+            while (bNames.hasMoreElements()) {
+                String bName = bNames.nextElement();
+                Pair p = (Pair)pairList.get(bName);
+                if (p.getSupport() < tSupport ||
+                    p.getConfidence() < tConfidence) {
+                    pairList.remove(bName);
                 }
             }
         }
@@ -211,6 +227,9 @@ class Pipair {
             Iterator i = calls.iterator();
             while (i.hasNext()) {
                 Hashtable<String,Pair> invariantsForCall = invariants.get(i.next());
+                if (invariantsForCall == null) {
+                    continue;
+                }
                 Enumeration pairs = invariantsForCall.elements();
                 while (pairs.hasMoreElements()) {
                     Pair invariant = (Pair)pairs.nextElement();
