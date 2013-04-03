@@ -89,7 +89,7 @@ class Pipair {
         Runtime rt = Runtime.getRuntime();
         Hashtable<String, ArrayList<String>> table = new Hashtable<String,ArrayList<String>>();
         try {
-            Process pr = rt.exec("opt -print-callgraph " + fileName);
+            Process pr = rt.exec("opt -print-callgraph -disable-output " + fileName);
             InputStream st = pr.getErrorStream();
             BufferedReader in = new BufferedReader(new InputStreamReader(st));
             String line = null;
