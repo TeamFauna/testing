@@ -50,6 +50,7 @@ class Pipair {
                     break;
                   }
                 case(1):
+                  System.out.println("STATE 1");
                   if (line.matches("CS<0x[1-9a-f]*> calls function")) {
                     String[] slist = line.split("\'");
                     String func = slist[1];
