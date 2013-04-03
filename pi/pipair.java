@@ -155,7 +155,7 @@ class Pipair {
             prog.tSupport = Integer.parseInt(args[1]);
         }
         if (args.length >= 3) {
-            prog.tConfidence = Float.parseFloat(args[2]);
+            prog.tConfidence = (float)Integer.parseInt(args[2])/100;
         }
         if (args.length >= 4) {
             Parser.levels = Integer.parseInt(args[3]);
