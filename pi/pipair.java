@@ -17,6 +17,7 @@ class Pipair {
 
     int tSupport = 3;
     float tConfidence = 0.65f;
+    NumberFormat numf = NumberFormat.getNumberInstance();
 
     class Pair {
         private String _aName;
@@ -54,12 +55,16 @@ class Pipair {
         }
 
         public String toString() {
-            NumberFormat numf = NumberFormat.getNumberInstance();
-            numf.setMaximumFractionDigits(2);
-            numf.setRoundingMode(RoundingMode.HALF_EVEN);
+            String a = getSource();
+            String b = getTarget();
+            if (a.compareTo(b) > 0) {
+                String temp = a;
+                a = b;
+                b = temp;
+            }
 
             return "pair: (" +
-                getSource() + " " + getTarget() + "), support: " +
+                a + " " + b + "), support: " +
                 getSupport() + ", confidence: " +
                 numf.format(getConfidence() * 100.0) + "%";
         }
@@ -216,12 +221,10 @@ class Pipair {
 
         ArrayList<Violation> violations = new ArrayList<Violation>();
 
-        Set<Map.Entry<String,ArrayList<String>>> cgSet = cg.entrySet();
-        Iterator functions = cgSet.iterator();
-        while (functions.hasNext()) {
-            Map.Entry<String,ArrayList<String>> entry = (Map.Entry<String,ArrayList<String>>)functions.next();
-            String functionName = (String)entry.getKey();
-            ArrayList<String> callsL = (ArrayList<String>)entry.getValue();
+        Enumeration<String> cgKeySet = cg.keys();
+        while (cgKeySet.hasMoreElements()) {
+            String functionName = (String)cgKeySet.nextElement();
+            ArrayList<String> callsL = (ArrayList<String>)cg.get(functionName);
             HashSet<String> calls = new HashSet<String>(callsL);
 
             Iterator i = calls.iterator();
@@ -245,6 +248,10 @@ class Pipair {
     }
 
     public void run(String cgFile) {
+        numf.setMaximumFractionDigits(2);
+        numf.setMinimumFractionDigits(2);
+        numf.setRoundingMode(RoundingMode.HALF_EVEN);
+
         Hashtable<String,ArrayList<String>> cg = parseFile(cgFile);
         Hashtable<String,Hashtable<String,Pair>> invariants =
             getInvariantPairs(cg);
