@@ -3,6 +3,9 @@ import java.util.Enumeration;
 import java.util.Collections;
 import java.io.IOException;
 import java.util.Hashtable;
+import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 class Pipair {
 
@@ -22,6 +25,15 @@ class Pipair {
         try {
             Process pr = rt.exec("opt -print-callgraph " + fileName);
             System.out.println("test2");
+            InputStream st = pr.getInputStream();
+            BufferedReader in = new BufferedReader(new InputStreamReader(st));
+            String line = null;
+
+            while ((line = in.readLine()) != null) { 
+              System.out.println(line);
+
+            }
+
         } catch (IOException e) {
         }
         return null;
