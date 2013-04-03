@@ -30,7 +30,8 @@ class Pipair {
             String line = null;
 
             while ((line = in.readLine()) != null) { 
-              System.out.println(line);
+
+              System.out.println(line + " " + line.length);
 
             }
 
