@@ -35,13 +35,11 @@ class Pipair {
             String current = null;
             while ((line = in.readLine()) != null) { 
 
-              System.out.println(line + " " + line.length());
+              //System.out.println(line + " " + line.length());
 
               switch (state) {
                 case(1):
-                  System.out.println("STATE 1");
                   if (line.matches("(.*)CS<0x[0-9a-f]*> calls function(.*)")) {
-                    System.out.println("STATE 2jkashdfjkdlshfgasjklf");
                     String[] slist = line.split("\'");
                     String func = slist[1];
                     ArrayList<String> curList = table.get(current);
@@ -63,6 +61,7 @@ class Pipair {
                 default:
                   if (line.length() == 0) { 
                     state = 0;
+                    System.out.println("");
                   }
                   break;
               }
@@ -71,7 +70,7 @@ class Pipair {
 
         } catch (IOException e) {
         }
-        return null;
+        return table;
     }
 
     public ArrayList<Pair> getPairs() {
