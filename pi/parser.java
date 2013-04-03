@@ -15,9 +15,7 @@ import java.text.NumberFormat;
 import java.math.RoundingMode;
 
 class Parser {
-    public static int levels = 0;
-
-    public static Hashtable<String,ArrayList<String>> parseFile(String fileName) {
+    public static Hashtable<String,ArrayList<String>> parseFile(String fileName, int levels) {
         Runtime rt = Runtime.getRuntime();
         Hashtable<String, ArrayList<String>> table = new Hashtable<String,ArrayList<String>>();
         try {
@@ -67,7 +65,7 @@ class Parser {
             }
             
             //If we are expanding functions n levels deep, we do it here
-            for (int l = 0; l < Parser.levels; l++) {
+            for (int l = 0; l < levels; l++) {
               Hashtable<String,ArrayList<String>> staticTable = deepCopy(table);
 
               Enumeration funcs = table.elements();

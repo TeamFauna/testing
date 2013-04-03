@@ -18,6 +18,7 @@ class Pipair {
 
     int tSupport = 3;
     float tConfidence = 0.65f;
+    int levels = 0;
     NumberFormat numf = NumberFormat.getNumberInstance();
     ArrayList<String> prints = new ArrayList<String>();
 
@@ -137,7 +138,7 @@ class Pipair {
         numf.setMinimumFractionDigits(2);
         numf.setRoundingMode(RoundingMode.HALF_EVEN);
 
-        Hashtable<String,ArrayList<String>> cg = Parser.parseFile(cgFile);
+        Hashtable<String,ArrayList<String>> cg = Parser.parseFile(cgFile,levels);
         SupportGraph sg = new SupportGraph();
         sg.parseFromCallGraph(cg);
         findAndPrintViolations(cg, sg);
@@ -158,7 +159,7 @@ class Pipair {
             prog.tConfidence = (float)Integer.parseInt(args[2])/100;
         }
         if (args.length >= 4) {
-            Parser.levels = Integer.parseInt(args[3]);
+            prog.levels = Integer.parseInt(args[3]);
         }
         prog.run(args[0]);
     }
