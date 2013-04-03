@@ -132,7 +132,7 @@ class Pipair {
         Enumeration funcs = cg.elements();
         while (funcs.hasMoreElements()) {
             ArrayList<String> calls = (ArrayList<String>)funcs.nextElement();
-            removeDuplicateCalls(calls);
+            calls = removeDuplicateCalls(calls);
 
             for (int i = 0; i < calls.size(); i++) {
                 for (int j = i + 1; j < calls.size(); j++) {
@@ -183,9 +183,10 @@ class Pipair {
         p.strengthen();
     }
 
-    private void removeDuplicateCalls(ArrayList<String> calls) {
-        HashSet<String> callSet = new HashSet(calls);
-        calls = new ArrayList(callSet);
+    private ArrayList<String> removeDuplicateCalls(ArrayList<String> calls) {
+        HashSet<String> callSet = new HashSet<String>(calls);
+        calls = new ArrayList<String>(callSet);
+        return calls;
     }
 
     public ArrayList<Violation>
@@ -200,11 +201,11 @@ class Pipair {
             Map.Entry<String,ArrayList<String>> entry = (Map.Entry<String,ArrayList<String>>)functions.next();
             String functionName = (String)entry.getKey();
             ArrayList<String> callsL = (ArrayList<String>)entry.getValue();
-            HashSet<String> calls = new HashSet(callsL);
+            HashSet<String> calls = new HashSet<String>(callsL);
 
             Iterator i = calls.iterator();
             while (i.hasNext()) {
-                Hashtable invariantsForCall = invariants.get(i.next());
+                Hashtable<String,Pair> invariantsForCall = invariants.get(i.next());
                 Enumeration pairs = invariantsForCall.elements();
                 while (pairs.hasMoreElements()) {
                     Pair invariant = (Pair)pairs.nextElement();
