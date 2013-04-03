@@ -15,6 +15,8 @@ import java.text.NumberFormat;
 import java.math.RoundingMode;
 
 class Parser {
+    public static int levels = 0;
+
     public static Hashtable<String,ArrayList<String>> parseFile(String fileName) {
         Runtime rt = Runtime.getRuntime();
         Hashtable<String, ArrayList<String>> table = new Hashtable<String,ArrayList<String>>();
@@ -37,7 +39,9 @@ class Parser {
                     String[] slist = line.split("\'");
                     String func = slist[1];
                     ArrayList<String> curList = table.get(current);
-                    curList.add(func);
+                    if (!curList.contains(func)) { 
+                      curList.add(func);
+                    }
                     //System.out.println(func);
                     break;
                   }
@@ -61,9 +65,52 @@ class Parser {
               }
 
             }
+            
+            //If we are expanding functions n levels deep, we do it here
+            for (int l = 0; l < Parser.levels; l++) {
+              Hashtable<String,ArrayList<String>> staticTable = deepCopy(table);
 
+              Enumeration funcs = table.elements();
+
+              while (funcs.hasMoreElements()) {
+                ArrayList<String> calls = (ArrayList<String>)funcs.nextElement();
+
+                ArrayList<String> originalCalls = (ArrayList<String>)calls.clone();
+
+                for (int i = 0; i < originalCalls.size(); i++) {
+                  String expandFunc = originalCalls.get(i);
+
+                  ArrayList<String> funcsToBeAdded = staticTable.get(expandFunc);
+
+                  for (int j = 0; j < funcsToBeAdded.size(); j++) {
+                    String funcToBeAdded = (String)funcsToBeAdded.get(j);
+                    if (!calls.contains(funcToBeAdded)) {
+                      calls.add(funcToBeAdded);
+                    }
+                  }
+                }
+              }
+            }
         } catch (IOException e) {
         }
         return table;
+    }
+
+    public static Hashtable<String,ArrayList<String>> deepCopy(Hashtable<String,ArrayList<String>> iniTable) {
+      Hashtable<String,ArrayList<String>> nTable = new Hashtable<String,ArrayList<String>>();
+
+      Enumeration funcs = iniTable.keys();
+      
+      while (funcs.hasMoreElements()) { 
+        String func = (String)funcs.nextElement();
+        ArrayList<String> iniCalls = iniTable.get(func); 
+
+        ArrayList<String> nCalls = (ArrayList<String>)iniCalls.clone();
+
+        nTable.put(func, nCalls);
+      }
+      
+      return nTable;
+
     }
 }

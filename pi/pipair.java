@@ -229,6 +229,9 @@ class Pipair {
         if (args.length >= 3) {
             prog.tConfidence = Float.parseFloat(args[2]);
         }
+        if (args.length >= 4) {
+            Parser.levels = Integer.parseInt(args[3]);
+        }
         prog.run(args[0]);
     }
 }
