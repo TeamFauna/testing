@@ -41,19 +41,21 @@ class Pipair {
                 case(0):
                   if (line.startsWith("Call graph node for function")) {
                     
-                    String[] slist = line.split('\'');
+                    String[] slist = line.split("\'");
                     current = slist[1];
                     ArrayList<String> nlist = new ArrayList<String>();
                     table.put(current,nlist);
                     state = 1;
+                    System.out.println(current);
                     break;
                   }
                 case(1):
                   if (line.matches("CS\\<0x[1-9a-f]*\\> calls function")) {
-                    String[] slist = line.split('\'');
+                    String[] slist = line.split("\'");
                     String func = slist[1];
                     ArrayList<String> curList = table.get(current);
                     curList.add(func);
+                    System.out.println(func);
                     break;
                   }
                 default:
