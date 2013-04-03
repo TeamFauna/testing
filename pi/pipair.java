@@ -50,7 +50,7 @@ class Pipair {
                     break;
                   }
                 case(1):
-                  if (line.matches("CS\\<0x[1-9a-f]*\\> calls function")) {
+                  if (line.matches("CS<0x[1-9a-f]*> calls function")) {
                     String[] slist = line.split("\'");
                     String func = slist[1];
                     ArrayList<String> curList = table.get(current);
