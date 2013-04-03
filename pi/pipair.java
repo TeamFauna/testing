@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.Iterator;
 import java.util.Map;
 import java.io.InputStream;
@@ -199,7 +200,7 @@ class Pipair {
 
         ArrayList<Violation> violations = new ArrayList<Violation>();
 
-        HashSet<Map.Entry<String,ArrayList<String>>> cgSet = (HashSet<Map.Entry<String,ArrayList<String>>>)cg.entrySet();
+        Set<Map.Entry<String,ArrayList<String>>> cgSet = cg.entrySet();
         Iterator functions = cgSet.iterator();
         while (functions.hasNext()) {
             Map.Entry<String,ArrayList<String>> entry = (Map.Entry<String,ArrayList<String>>)functions.next();
