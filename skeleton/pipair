@@ -1,0 +1,1 @@
+java -cp ../../pi -XX:MaxHeapSize=256m Pipair $1 $2 $3
